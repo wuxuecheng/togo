@@ -44,7 +44,7 @@ TEST_F(DateTimeTest, Wednesday)
     EXPECT_EQ(3, date.getWeekday()) << "date: " << str;
 }
 
-TEST_F(DateTimeTest, Thusday)
+TEST_F(DateTimeTest, Thursday)
 {    
     string str = "2013-10-17";
     DateTime date(str);
