@@ -17,6 +17,7 @@ public:
     inline bool operator<(const DateTime& rhs) const;
     inline bool operator<=(const DateTime& rhs) const;
     inline bool isValid() const;
+
     inline int getWeekday() const;
     inline int getDiffDayNum(const DateTime& rhs) const;
     inline DateTime& addDay(int n);
@@ -71,3 +72,4 @@ bool DateTime::operator<=(const DateTime& rhs) const
 }
 
 #endif // DATE_TIME_H_
+
