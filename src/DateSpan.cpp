@@ -79,7 +79,7 @@ DateSpan DateSpan::intersect(const DateSpan& rhs) const
 }
 
 void DateSpan::substitute(const std::vector<DateSpan>& in,
-                          std::vector<DateSpan>* out)
+                          std::vector<DateSpan>* out) const
 {
     (*out).push_back(*this);
 

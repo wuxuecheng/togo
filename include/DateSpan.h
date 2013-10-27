@@ -37,7 +37,7 @@ public:
     DateSpan& shiftDays(int dayNum);
     DateSpan intersect(const DateSpan& rhs) const;
     void substitute(const std::vector<DateSpan>& in,
-                    std::vector<DateSpan>* out);
+                    std::vector<DateSpan>* out) const;
 
     static void merge(const std::vector<DateSpan>& in,
                       std::vector<DateSpan>* out);
