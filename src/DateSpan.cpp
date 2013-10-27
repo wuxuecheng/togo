@@ -2,6 +2,8 @@
 #include <map>
 #include <vector>
 
+#define CROL(value, width, bits) ((value << bits) | (value >> (width - bits)))
+#define CROR(value, width, bits) ((value >> bits) | (value << (width - bits)))
 
 DateSpan::DateSpan(const std::string& fromDate,
                    const std::string& toDate,
@@ -70,8 +72,9 @@ void DateSpan::substitute(const std::vector<DateSpan>& in,
     for (std::vector<DateSpan>::const_iterator inIter = in.begin();
          inIter != in.end(); ++inIter)
     {
-        // *inIter   ======
-        // newDp             --------
+        //  +++ 代表的日期段是我们想要的
+        // *inIter  ++++++++
+        // newDp               --------
         if ((*inIter).toDate() < newDp.fromDate() ||
             newDp.toDate() < (*inIter).fromDate())
         {
@@ -79,7 +82,7 @@ void DateSpan::substitute(const std::vector<DateSpan>& in,
         }
         else
         {
-            // *inIter ======-------
+            // *inIter ++++++-------
             // newDp         -------------
             if ((*inIter).fromDate() < newDp.fromDate() &&
                 newDp.fromDate() < (*inIter).toDate())
@@ -90,7 +93,7 @@ void DateSpan::substitute(const std::vector<DateSpan>& in,
                                           toDate,
                                           (*inIter).period()));
             }
-            // *inIter         -----======
+            // *inIter         -----+++++++
             // newDp   -------------
             if ((*inIter).fromDate() < newDp.toDate() &&
                 newDp.toDate() < (*inIter).toDate())
@@ -127,15 +130,24 @@ void DateSpan::merge(const std::vector<DateSpan>& in,
     while (dateNextIter != date.end())
     {
         DateTime currFromDate = (*dateIter).first;
+        // 该日期不是起始日期，则需要后移1天  
         if (((*dateIter).second & FROM_DATE) == 0)
         {
             currFromDate.addDay(1);
         }
 
         DateTime currToDate = (*dateNextIter).first;
+        // 该日期不是终止日期，则需要前移1天
         if (((*dateNextIter).second & TO_DATE) == 0)
         {
             currToDate.addDay(-1);
+        }
+
+        if (currToDate < currFromDate)
+        {
+            dateIter++;
+            dateNextIter++;
+            continue;
         }
 
         char currPeriod = 0;
@@ -221,17 +233,24 @@ bool DateSpan::hasEffectiveDay(const DateTime& from,
 
 DateSpan& DateSpan::normalize()
 {
-    if (period_  == 0) return *this;
-
+    if (period_  == 0)
+    {
+        fromDate_ = DateTime("0000-00-00");
+        toDate_ = DateTime("0000-00-00");
+        return *this;
+    }
+    // 调整起始日期
     int dayShift = 0;
     int wday = toDate_.getWeekday();
     while (!isWeekdaySet(period_, wday))
     {
-        wday = (wday - 1) % 7;
         dayShift--;
+        wday--;
+        if (wday == 0)
+            wday = 7;        
     }
     toDate_.addDay(dayShift);
-
+    // 调整终止日期
     dayShift = 0;
     wday = fromDate_.getWeekday();
     while (!isWeekdaySet(period_, wday))
@@ -242,21 +261,39 @@ DateSpan& DateSpan::normalize()
     fromDate_.addDay(dayShift);
 
     int dayNum = toDate_.getDiffDayNum(fromDate_);
-    if (dayNum <= 0)
+    if (dayNum < 0)
     {
+        fromDate_ = DateTime("0000-00-00");
+        toDate_ = DateTime("0000-00-00");
         period_ = 0;
         return *this;
     }
 
-    if (dayNum <= 7)
+    // 如果日期数小于7，则需调整period
+    if (dayNum < 7)
     {
         char effective = 0;
-        for (int i = 0; i < dayNum; i++)
+        for (int i = 0; i <= dayNum; i++)
         {
             effective |= (1 << wday);
             wday = (wday + 1) % 7;
         }
         period_ &= effective;
+    }
+    return *this;
+}
+
+DateSpan& DateSpan::shiftDays(int dayNum)
+{
+    if (dayNum != 0)
+    {
+        fromDate_.addDay(dayNum);
+        toDate_.addDay(dayNum);
+        if (dayNum < 0)
+        {
+            dayNum = (dayNum % 7) + 7;
+        }
+        period_ = CROL(period_, 7, dayNum);
     }
     return *this;
 }

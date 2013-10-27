@@ -34,6 +34,7 @@ public:
     inline std::string toString() const;
 
     DateSpan& normalize();
+    DateSpan& shiftDays(int dayNum);
     DateSpan intersect(const DateSpan& rhs) const;
 
     static void substitute(const std::vector<DateSpan>& in,
