@@ -48,3 +48,18 @@ TEST_F(DateSpanTest, SamePeriod)
     EXPECT_EQ("2013-10-13|2013-10-26|1237", out[0].toString());
 }
 
+TEST_F(DateSpanTest, intersect)
+{
+    DateSpan dp1("2013-10-14", "2013-10-18", "2357");
+    DateSpan dp2("2013-10-13", "2013-10-26", "12347");
+    DateSpan dp3 = dp1.intersect(dp2);
+    EXPECT_EQ("2013-10-14|2013-10-18|237", dp3.toString());
+
+    DateSpan dp4 = dp1.intersect(dp3);
+    EXPECT_EQ("2013-10-14|2013-10-18|237", dp4.toString());
+
+    DateSpan dp5("2013-10-20", "2013-10-29", "2357");
+    DateSpan dp6 = dp4.intersect(dp5);
+    EXPECT_EQ("0000-00-00|0000-00-00|", dp6.toString());
+}
+

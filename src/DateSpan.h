@@ -36,10 +36,9 @@ public:
     DateSpan& normalize();
     DateSpan& shiftDays(int dayNum);
     DateSpan intersect(const DateSpan& rhs) const;
+    void substitute(const std::vector<DateSpan>& in,
+                    std::vector<DateSpan>* out);
 
-    static void substitute(const std::vector<DateSpan>& in,
-                           const DateSpan& newDp,
-                           std::vector<DateSpan>* out);
     static void merge(const std::vector<DateSpan>& in,
                       std::vector<DateSpan>* out);
 

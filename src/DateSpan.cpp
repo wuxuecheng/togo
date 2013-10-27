@@ -56,49 +56,63 @@ char DateSpan::periodStrToByte(const std::string& period)
 
 DateSpan DateSpan::intersect(const DateSpan& rhs) const
 {
-    DateTime newFromDate(rhs.fromDate_ < rhs.fromDate_ ?
-                         fromDate_ : rhs.fromDate_);
-    DateTime newToDate(toDate_ < rhs.toDate_ ? toDate_ : rhs.toDate_);
     char newPeriod = period_ & rhs.period_;
-    return DateSpan(newFromDate, newToDate, newPeriod);
+    if (newPeriod == 0 ||
+        toDate_ < rhs.fromDate_ ||
+        rhs.toDate_ < fromDate_)
+    {
+        return DateSpan("0000-00-00", "0000-00-00", "");
+    }
+    
+    DateTime newFromDate(rhs.fromDate_ < rhs.fromDate_ ?
+                         rhs.fromDate_ : fromDate_);
+    DateTime newToDate(toDate_ < rhs.toDate_ ? toDate_ : rhs.toDate_);
+
+    if (newToDate < newFromDate)
+    {
+        return DateSpan("0000-00-00", "0000-00-00", "");
+    }
+    else
+    {
+        return DateSpan(newFromDate, newToDate, newPeriod);
+    }
 }
 
 void DateSpan::substitute(const std::vector<DateSpan>& in,
-                          const DateSpan& newDp,
                           std::vector<DateSpan>* out)
 {
-    (*out).push_back(newDp);
+    (*out).push_back(*this);
 
     for (std::vector<DateSpan>::const_iterator inIter = in.begin();
          inIter != in.end(); ++inIter)
     {
         //  +++ 代表的日期段是我们想要的
         // *inIter  ++++++++
-        // newDp               --------
-        if ((*inIter).toDate() < newDp.fromDate() ||
-            newDp.toDate() < (*inIter).fromDate())
+        // (*this)               --------
+        if ((*inIter).toDate() < (*this).fromDate() ||
+            (*this).toDate() < (*inIter).fromDate())
         {
             (*out).push_back(*inIter);
         }
         else
         {
             // *inIter ++++++-------
-            // newDp         -------------
-            if ((*inIter).fromDate() < newDp.fromDate() &&
-                newDp.fromDate() < (*inIter).toDate())
+            // (*this)         -------------
+            if ((*inIter).fromDate() < (*this).fromDate() &&
+                (*this).fromDate() < (*inIter).toDate())
             {
-                DateTime toDate(newDp.fromDate());
+                DateTime toDate((*this).fromDate());
                 toDate.addDay(-1);
                 (*out).push_back(DateSpan((*inIter).fromDate(),
                                           toDate,
                                           (*inIter).period()));
             }
             // *inIter         -----+++++++
-            // newDp   -------------
-            if ((*inIter).fromDate() < newDp.toDate() &&
-                newDp.toDate() < (*inIter).toDate())
+            // (*this)   -------------
+            if ((*inIter).fromDate() < (*this).toDate() &&
+                (*this).toDate() < (*inIter).toDate())
             {
-                DateTime fromDate(newDp.toDate());
+                DateTime fromDate((*this).toDate());
                 fromDate.addDay(1);
                 (*out).push_back(DateSpan(fromDate,
                                           (*inIter).toDate(),
