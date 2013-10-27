@@ -54,15 +54,55 @@ char DateSpan::periodStrToByte(const std::string& period)
 
 DateSpan DateSpan::intersect(const DateSpan& rhs) const
 {
-    if ((period_ & rhs.period_) == 0)
-    {
-        return DateSpan("0000-00-00", "0000-00-00", 0);
-    }
+    DateTime newFromDate(rhs.fromDate_ < rhs.fromDate_ ?
+                         fromDate_ : rhs.fromDate_);
+    DateTime newToDate(toDate_ < rhs.toDate_ ? toDate_ : rhs.toDate_);
+    char newPeriod = period_ & rhs.period_;
+    return DateSpan(newFromDate, newToDate, newPeriod);
 }
 
-void DateSpan::substitute(const std::vector<DateSpan>& dps,
-                          const DateSpan& newDp)
+void DateSpan::substitute(const std::vector<DateSpan>& in,
+                          const DateSpan& newDp,
+                          std::vector<DateSpan>* out)
 {
+    (*out).push_back(newDp);
+
+    for (std::vector<DateSpan>::const_iterator inIter = in.begin();
+         inIter != in.end(); ++inIter)
+    {
+        // *inIter   ======
+        // newDp             --------
+        if ((*inIter).toDate() < newDp.fromDate() ||
+            newDp.toDate() < (*inIter).fromDate())
+        {
+            (*out).push_back(*inIter);
+        }
+        else
+        {
+            // *inIter ======-------
+            // newDp         -------------
+            if ((*inIter).fromDate() < newDp.fromDate() &&
+                newDp.fromDate() < (*inIter).toDate())
+            {
+                DateTime toDate(newDp.fromDate());
+                toDate.addDay(-1);
+                (*out).push_back(DateSpan((*inIter).fromDate(),
+                                          toDate,
+                                          (*inIter).period()));
+            }
+            // *inIter         -----======
+            // newDp   -------------
+            if ((*inIter).fromDate() < newDp.toDate() &&
+                newDp.toDate() < (*inIter).toDate())
+            {
+                DateTime fromDate(newDp.toDate());
+                fromDate.addDay(1);
+                (*out).push_back(DateSpan(fromDate,
+                                          (*inIter).toDate(),
+                                          (*inIter).period()));
+            }
+        }
+    }        
 }
 
 void DateSpan::merge(const std::vector<DateSpan>& in,
@@ -86,7 +126,7 @@ void DateSpan::merge(const std::vector<DateSpan>& in,
     ++dateNextIter;
     while (dateNextIter != date.end())
     {
-        DateTime currFromDate = (*dateIter).first;        
+        DateTime currFromDate = (*dateIter).first;
         if (((*dateIter).second & FROM_DATE) == 0)
         {
             currFromDate.addDay(1);

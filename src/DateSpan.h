@@ -30,14 +30,15 @@ public:
     inline void setPeriod(char rhs);
     inline void setPeriod(const std::string& rhs);
 
-    
     inline std::string getPeriodStr() const;
     inline std::string toString() const;
-    DateSpan& normalize();
 
+    DateSpan& normalize();
     DateSpan intersect(const DateSpan& rhs) const;
-    static void substitute(const std::vector<DateSpan>& dps,
-                           const DateSpan& newDp);
+
+    static void substitute(const std::vector<DateSpan>& in,
+                           const DateSpan& newDp,
+                           std::vector<DateSpan>* out);
     static void merge(const std::vector<DateSpan>& in,
                       std::vector<DateSpan>* out);
 
