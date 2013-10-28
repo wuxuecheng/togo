@@ -12,8 +12,8 @@ public:
 
     inline void reset();
     inline void moveNext();
-	inline bool isEof() const;
-    inline std::string getCurrentStr() const;    
+    inline bool isEof() const;
+    inline std::string getCurrentStr() const;
     void getAllFields(std::vector<std::string>* array) const;
 
 private:
@@ -46,4 +46,3 @@ std::string Spliter::getCurrentStr() const
 }
 
 #endif // SPLITER_H_
-
