@@ -245,10 +245,10 @@ DateSpan& DateSpan::normalize()
     int wday = toDate_.getWeekday();
     while (!isWeekdaySet(period_, wday))
     {
-        dayShift--;
         wday--;
         if (wday == 0)
             wday = 7;
+        dayShift--;
     }
     toDate_.addDay(dayShift);
 
@@ -291,10 +291,9 @@ DateSpan& DateSpan::shiftDays(int dayNum)
     {
         fromDate_.addDay(dayNum);
         toDate_.addDay(dayNum);
+        dayNum %= 7;
         if (dayNum < 0)
-        {
-            dayNum = (dayNum % 7) + 7;
-        }
+            dayNum += 7;
         period_ = CROL(period_, 7, dayNum);
     }
     return *this;
