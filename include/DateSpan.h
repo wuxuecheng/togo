@@ -8,14 +8,8 @@
 class DateSpan
 {
 public:
-    DateSpan(const std::string& fromDate,
-               const std::string& toDate,
-               const std::string& period);
-
-    DateSpan(const DateTime& fromDate,
-               const DateTime& toDate,
-               char period);
-
+    DateSpan(const std::string& fromDate, const std::string& toDate, const std::string& period);
+    DateSpan(const DateTime& fromDate, const DateTime& toDate, char period);
     ~DateSpan();
 
     inline const DateTime& fromDate() const;
@@ -36,20 +30,15 @@ public:
     DateSpan& normalize();
     DateSpan& shiftDays(int dayNum);
     DateSpan intersect(const DateSpan& rhs) const;
-    void substitute(const std::vector<DateSpan>& in,
-                    std::vector<DateSpan>* out) const;
+    void substitute(const std::vector<DateSpan>& in, std::vector<DateSpan>* out) const;
 
-    static void merge(const std::vector<DateSpan>& in,
-                      std::vector<DateSpan>* out);
+    static void merge(const std::vector<DateSpan>& in, std::vector<DateSpan>* out);
 
 protected:
     static std::string periodByteToStr(char period);
     static char periodStrToByte(const std::string& period);
-    static bool canBeMerged(const DateSpan& first,
-                            const DateSpan& second);
-    static bool hasEffectiveDay(const DateTime& start,
-                                const DateTime& end,
-                                char period);
+    static bool canBeMerged(const DateSpan& first, const DateSpan& second);
+    static bool hasEffectiveDay(const DateTime& start, const DateTime& end, char period);
     static inline bool isWeekdaySet(char period, int day);
 
 protected:
@@ -110,9 +99,7 @@ std::string DateSpan::getPeriodStr() const
 
 std::string DateSpan::toString() const
 {
-    return fromDate_.getDateStr() + "|"
-        + toDate_.getDateStr() + "|"
-        + getPeriodStr();
+    return fromDate_.getDateStr() + "|" + toDate_.getDateStr() + "|" + getPeriodStr();
 }
 
 bool DateSpan::isWeekdaySet(char period, int day)

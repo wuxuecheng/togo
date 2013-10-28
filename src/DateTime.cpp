@@ -2,8 +2,7 @@
 #include <cstdio>
 #include <string>
 
-DateTime::DateTime(const std::string& date,
-                   const std::string& time)
+DateTime::DateTime(const std::string& date, const std::string& time)
 {
     int year = str2int(date.substr(0, 4));
     int mon  = str2int(date.substr(5, 2));
@@ -31,19 +30,13 @@ void DateTime::setTime(int year, int mon, int day, int hour, int min, int sec)
 
     secTime_ = mktime(&time_);
 
-    isValid_ = secTime_ != -1 &&
-        time_.tm_year == year-1900 &&
-        time_.tm_mon == mon-1 &&
-        time_.tm_mday == day;
+    isValid_ = secTime_ != -1 && time_.tm_year == year-1900 && time_.tm_mon == mon-1 && time_.tm_mday == day;
 }
 
 std::string DateTime::getDateStr() const
 {
     char buf[64];
-    sprintf(buf, "%04d-%02d-%02d",
-            time_.tm_year+1900,
-            time_.tm_mon+1,
-            time_.tm_mday);
+    sprintf(buf, "%04d-%02d-%02d", time_.tm_year+1900, time_.tm_mon+1, time_.tm_mday);
     return std::string(buf);
 }
 
