@@ -14,14 +14,14 @@ public:
         }
 };
 
-DateSpan::DateSpan(const std::string& fromDate, const std::string& toDate, const std::string& period)
-    : fromDate_(fromDate), toDate_(toDate)
+DateSpan::DateSpan(const std::string& from_date, const std::string& to_date, const std::string& period)
+    : from_date_(from_date), to_date_(to_date)
 {
     period_ = periodStrToByte(period);
 }
 
-DateSpan::DateSpan(const DateTime& fromDate, const DateTime& toDate, char period)
-    : fromDate_(fromDate), toDate_(toDate), period_(period)
+DateSpan::DateSpan(const DateTime& from_date, const DateTime& to_date, char period)
+    : from_date_(from_date), to_date_(to_date), period_(period)
 {
 }
 
@@ -31,7 +31,7 @@ DateSpan::~DateSpan()
 
 std::string DateSpan::periodByteToStr(char period)
 {
-    std::string strPeriod = "";
+    std::string str_period = "";
     char buf[4];
 
     int wday = 1;
@@ -40,12 +40,12 @@ std::string DateSpan::periodByteToStr(char period)
         if (isWeekdaySet(period, wday))
         {
             sprintf(buf, "%d", wday);
-            strPeriod += buf;
+            str_period += buf;
         }
         wday++;
     }
 
-    return strPeriod;
+    return str_period;
 }
 
 char DateSpan::periodStrToByte(const std::string& period)
@@ -60,22 +60,22 @@ char DateSpan::periodStrToByte(const std::string& period)
 
 DateSpan DateSpan::intersect(const DateSpan& rhs) const
 {
-    char newPeriod = period_ & rhs.period_;
-    if (newPeriod == 0 || toDate_ < rhs.fromDate_ || rhs.toDate_ < fromDate_)
+    char new_period = period_ & rhs.period_;
+    if (new_period == 0 || to_date_ < rhs.from_date_ || rhs.to_date_ < from_date_)
     {
         return DateSpan("0000-00-00", "0000-00-00", "");
     }
 
-    DateTime newFromDate(rhs.fromDate_ < rhs.fromDate_ ? rhs.fromDate_ : fromDate_);
-    DateTime newToDate(toDate_ < rhs.toDate_ ? toDate_ : rhs.toDate_);
+    DateTime new_from_date(rhs.from_date_ < rhs.from_date_ ? rhs.from_date_ : from_date_);
+    DateTime new_to_date(to_date_ < rhs.to_date_ ? to_date_ : rhs.to_date_);
 
-    if (newToDate < newFromDate)
+    if (new_to_date < new_from_date)
     {
         return DateSpan("0000-00-00", "0000-00-00", "");
     }
     else
     {
-        return DateSpan(newFromDate, newToDate, newPeriod);
+        return DateSpan(new_from_date, new_to_date, new_period);
     }
 }
 
@@ -83,35 +83,35 @@ void DateSpan::substitute(const std::vector<DateSpan>& in, std::vector<DateSpan>
 {
     (*out).push_back(*this);
 
-    for (std::vector<DateSpan>::const_iterator inIter = in.begin(); inIter != in.end(); ++inIter)
+    for (auto in_iter = in.begin(); in_iter != in.end(); ++in_iter)
     {
         //  +++ 代表的日期段是我们想要的
         // 两段日期没有交集
-        // *inIter  ++++++++
+        // *in_iter  ++++++++
         // (*this)               --------
-        if ((*inIter).toDate() < (*this).fromDate() || (*this).toDate() < (*inIter).fromDate())
+        if ((*in_iter).to_date() < (*this).from_date() || (*this).to_date() < (*in_iter).from_date())
         {
-            (*out).push_back(*inIter);
+            (*out).push_back(*in_iter);
         }
         else
         {
             // 有交集，取左边部分
-            // *inIter ++++++-------
-            // (*this)       -------------
-            if ((*inIter).fromDate() < (*this).fromDate() && (*this).fromDate() < (*inIter).toDate())
+            // *in_iter ++++++-------
+            // (*this)        -------------
+            if ((*in_iter).from_date() < (*this).from_date() && (*this).from_date() < (*in_iter).to_date())
             {
-                DateTime toDate((*this).fromDate());
-                toDate.addDay(-1);
-                (*out).push_back(DateSpan((*inIter).fromDate(), toDate, (*inIter).period()));
+                DateTime to_date((*this).from_date());
+                to_date.addDay(-1);
+                (*out).push_back(DateSpan((*in_iter).from_date(), to_date, (*in_iter).period()));
             }
             // 有交集，取右边部分
-            // *inIter           -----+++++++
+            // *in_iter          -----+++++++
             // (*this)   -------------
-            if ((*inIter).fromDate() < (*this).toDate() && (*this).toDate() < (*inIter).toDate())
+            if ((*in_iter).from_date() < (*this).to_date() && (*this).to_date() < (*in_iter).to_date())
             {
-                DateTime fromDate((*this).toDate());
-                fromDate.addDay(1);
-                (*out).push_back(DateSpan(fromDate, (*inIter).toDate(), (*inIter).period()));
+                DateTime from_date((*this).to_date());
+                from_date.addDay(1);
+                (*out).push_back(DateSpan(from_date, (*in_iter).to_date(), (*in_iter).period()));
             }
         }
     }
@@ -125,63 +125,63 @@ void DateSpan::merge(const std::vector<DateSpan>& in, std::vector<DateSpan>* out
     static const int TO_DATE   = 0x2;
 
     DatePoints date;
-    for (std::vector<DateSpan>::const_iterator inIter = in.begin(); inIter != in.end(); ++inIter)
+    for (auto in_iter = in.begin(); in_iter != in.end(); ++in_iter)
     {
-        date[&((*inIter).fromDate())] |= FROM_DATE;
-        date[&((*inIter).toDate())]   |= TO_DATE;
+        date[&((*in_iter).from_date())] |= FROM_DATE;
+        date[&((*in_iter).to_date())]   |= TO_DATE;
     }
 
-    DatePoints::const_iterator dateNextIter = date.begin();
-    DatePoints::const_iterator dateIter = date.begin();
-    for(dateNextIter++; dateNextIter != date.end(); dateIter++, dateNextIter++)
+    auto date_next_iter = date.begin();
+    auto date_iter = date.begin();
+    for(++date_next_iter; date_next_iter != date.end(); ++date_iter, ++date_next_iter)
     {
-        DateTime currFromDate = *((*dateIter).first);
+        DateTime curr_from_date = *((*date_iter).first);
         // 该日期不是起始日期，则去掉当前天，即日期后移1天
-        if (((*dateIter).second & FROM_DATE) == 0)
+        if (((*date_iter).second & FROM_DATE) == 0)
         {
-            currFromDate.addDay(1);
+            curr_from_date.addDay(1);
         }
 
-        DateTime currToDate = *((*dateNextIter).first);
+        DateTime curr_to_date = *((*date_next_iter).first);
         // 该日期不是终止日期，则去掉当前天，即日期前移1天
-        if (((*dateNextIter).second & TO_DATE) == 0)
+        if (((*date_next_iter).second & TO_DATE) == 0)
         {
-            currToDate.addDay(-1);
+            curr_to_date.addDay(-1);
         }
 
-        // 确保DatePeriod：fromDate <= toDate
-        if (currToDate < currFromDate)
+        // 确保DatePeriod：from_date <= to_date
+        if (curr_to_date < curr_from_date)
         {
             continue;
         }
 
-        char currPeriod = 0;
-        for (std::vector<DateSpan>::const_iterator inIter = in.begin(); inIter != in.end(); ++inIter)
+        char curr_period = 0;
+        for (auto in_iter = in.begin(); in_iter != in.end(); ++in_iter)
         {
-            if ((*inIter).fromDate() <= currFromDate && currToDate <= (*inIter).toDate())
+            if ((*in_iter).from_date() <= curr_from_date && curr_to_date <= (*in_iter).to_date())
             {
-                currPeriod |= (*inIter).period();
+                curr_period |= (*in_iter).period();
             }
         }
 
-        if (currPeriod == 0)
+        if (curr_period == 0)
         {
             continue;
         }
 
-        DateSpan current(currFromDate, currToDate, currPeriod);
-        bool needPushed = true;
+        DateSpan current(curr_from_date, curr_to_date, curr_period);
+        bool need_pushed = true;
         if ((*out).size() > 0)
         {
             DateSpan& last = (*out)[(*out).size()-1];
             if (canBeMerged(last, current))
             {
-                last.setToDate(current.toDate());
-                last.setPeriod(last.period() | current.period());
-                needPushed = false;
+                last.set_to_date(current.to_date());
+                last.set_period(last.period() | current.period());
+                need_pushed = false;
             }
         }
-        if (needPushed)
+        if (need_pushed)
         {
             (*out).push_back(current);
         }
@@ -197,29 +197,29 @@ bool DateSpan::canBeMerged(const DateSpan& first, const DateSpan& second)
     char p2only = p2 ^ same;
     char pboth = p1 | p2;
 
-    if (hasEffectiveDay(first.fromDate(), first.toDate(), p2only) ||
-        hasEffectiveDay(second.fromDate(), second.toDate(), p1only))
+    if (hasEffectiveDay(first.from_date(), first.to_date(), p2only) ||
+        hasEffectiveDay(second.from_date(), second.to_date(), p1only))
     {
         return false;
     }
 
-    DateTime fromDate(first.toDate());
-    fromDate.addDay(1);
-    DateTime toDate(second.fromDate());
-    toDate.addDay(-1);
+    DateTime from_date(first.to_date());
+    from_date.addDay(1);
+    DateTime to_date(second.from_date());
+    to_date.addDay(-1);
 
-    return !hasEffectiveDay(fromDate, toDate, pboth);
+    return !hasEffectiveDay(from_date, to_date, pboth);
 }
 
 bool DateSpan::hasEffectiveDay(const DateTime& from, const DateTime& to, char period)
 {
     if (period  == 0) return false;
 
-    int dayNum = to.getDiffDayNum(from);
-    if (dayNum >= 7) return true;
+    int day_num = to.getDiffDayNum(from);
+    if (day_num >= 7) return true;
 
     int wday = from.getWeekday();
-    for (int i = 0; i <= dayNum; i++)
+    for (int i = 0; i <= day_num; i++)
     {
         if (isWeekdaySet(period, wday))
         {
@@ -233,49 +233,49 @@ bool DateSpan::hasEffectiveDay(const DateTime& from, const DateTime& to, char pe
 
 DateSpan& DateSpan::normalize()
 {
-    if (period_  == 0)
+    if (period_ == 0)
     {
-        fromDate_ = DateTime("0000-00-00");
-        toDate_ = DateTime("0000-00-00");
+        from_date_ = DateTime("0000-00-00");
+        to_date_ = DateTime("0000-00-00");
         return *this;
     }
 
     // 调整起始日期
-    int dayShift = 0;
-    int wday = toDate_.getWeekday();
+    int day_shift = 0;
+    int wday = to_date_.getWeekday();
     while (!isWeekdaySet(period_, wday))
     {
         wday--;
         if (wday == 0)
             wday = 7;
-        dayShift--;
+        day_shift--;
     }
-    toDate_.addDay(dayShift);
+    to_date_.addDay(day_shift);
 
     // 调整终止日期
-    dayShift = 0;
-    wday = fromDate_.getWeekday();
+    day_shift = 0;
+    wday = from_date_.getWeekday();
     while (!isWeekdaySet(period_, wday))
     {
         wday = (wday + 1) % 7;
-        dayShift++;
+        day_shift++;
     }
-    fromDate_.addDay(dayShift);
+    from_date_.addDay(day_shift);
 
-    int dayNum = toDate_.getDiffDayNum(fromDate_);
-    if (dayNum < 0)
+    int day_num = to_date_.getDiffDayNum(from_date_);
+    if (day_num < 0)
     {
-        fromDate_ = DateTime("0000-00-00");
-        toDate_ = DateTime("0000-00-00");
+        from_date_ = DateTime("0000-00-00");
+        to_date_ = DateTime("0000-00-00");
         period_ = 0;
         return *this;
     }
 
     // 如果日期数小于7，则需调整period
-    if (dayNum < 7)
+    if (day_num < 7)
     {
         char effective = 0;
-        for (int i = 0; i <= dayNum; i++)
+        for (int i = 0; i <= day_num; i++)
         {
             effective |= (1 << wday);
             wday = (wday + 1) % 7;
@@ -285,16 +285,17 @@ DateSpan& DateSpan::normalize()
     return *this;
 }
 
-DateSpan& DateSpan::shiftDays(int dayNum)
+DateSpan& DateSpan::shiftDays(int day_num)
 {
-    if (dayNum != 0)
+    if (day_num != 0)
     {
-        fromDate_.addDay(dayNum);
-        toDate_.addDay(dayNum);
-        dayNum %= 7;
-        if (dayNum < 0)
-            dayNum += 7;
-        period_ = CROL(period_, 7, dayNum);
+        from_date_.addDay(day_num);
+        to_date_.addDay(day_num);
+        day_num %= 7;
+        if (day_num < 0)
+            day_num += 7;
+        period_ = CROL(period_, 7, day_num);
     }
     return *this;
 }
+

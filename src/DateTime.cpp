@@ -28,9 +28,9 @@ void DateTime::setTime(int year, int mon, int day, int hour, int min, int sec)
     time_.tm_year  = year - 1900;
     time_.tm_isdst = 0;
 
-    secTime_ = mktime(&time_);
+    sec_time_ = mktime(&time_);
 
-    isValid_ = secTime_ != -1 && time_.tm_year == year-1900 && time_.tm_mon == mon-1 && time_.tm_mday == day;
+    is_valid_ = sec_time_ != -1 && time_.tm_year == year-1900 && time_.tm_mon == mon-1 && time_.tm_mday == day;
 }
 
 std::string DateTime::getDateStr() const

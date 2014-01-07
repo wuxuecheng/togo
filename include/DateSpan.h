@@ -8,27 +8,27 @@
 class DateSpan
 {
 public:
-    DateSpan(const std::string& fromDate, const std::string& toDate, const std::string& period);
-    DateSpan(const DateTime& fromDate, const DateTime& toDate, char period);
+    DateSpan(const std::string& from_date, const std::string& to_date, const std::string& period);
+    DateSpan(const DateTime& from_date, const DateTime& to_date, char period);
     ~DateSpan();
 
-    inline const DateTime& fromDate() const;
-    inline void setFromDate(const DateTime& rhs);
-    inline void setFromDate(const std::string& rhs);
+    inline const DateTime& from_date() const;
+    inline void set_from_date(const DateTime& rhs);
+    inline void set_from_date(const std::string& rhs);
 
-    inline const DateTime& toDate() const;
-    inline void setToDate(const DateTime& rhs);
-    inline void setToDate(const std::string& rhs);
+    inline const DateTime& to_date() const;
+    inline void set_to_date(const DateTime& rhs);
+    inline void set_to_date(const std::string& rhs);
 
     inline char period() const;
-    inline void setPeriod(char rhs);
-    inline void setPeriod(const std::string& rhs);
+    inline void set_period(char rhs);
+    inline void set_period(const std::string& rhs);
 
     inline std::string getPeriodStr() const;
     inline std::string toString() const;
 
     DateSpan& normalize();
-    DateSpan& shiftDays(int dayNum);
+    DateSpan& shiftDays(int day_num);
     DateSpan intersect(const DateSpan& rhs) const;
     void substitute(const std::vector<DateSpan>& in, std::vector<DateSpan>* out) const;
 
@@ -42,39 +42,39 @@ protected:
     static inline bool isWeekdaySet(char period, int day);
 
 protected:
-    DateTime fromDate_;
-    DateTime toDate_;
+    DateTime from_date_;
+    DateTime to_date_;
     char period_;
 };
 
-const DateTime& DateSpan::fromDate() const
+const DateTime& DateSpan::from_date() const
 {
-    return fromDate_;
+    return from_date_;
 }
 
-void DateSpan::setFromDate(const DateTime& rhs)
+void DateSpan::set_from_date(const DateTime& rhs)
 {
-    fromDate_ = rhs;
+    from_date_ = rhs;
 }
 
-void DateSpan::setFromDate(const std::string& rhs)
+void DateSpan::set_from_date(const std::string& rhs)
 {
-    fromDate_ = DateTime(rhs);
+    from_date_ = DateTime(rhs);
 }
 
-const DateTime& DateSpan::toDate() const
+const DateTime& DateSpan::to_date() const
 {
-    return toDate_;
+    return to_date_;
 }
 
-void DateSpan::setToDate(const DateTime& rhs)
+void DateSpan::set_to_date(const DateTime& rhs)
 {
-    toDate_ = rhs;
+    to_date_ = rhs;
 }
 
-void DateSpan::setToDate(const std::string& rhs)
+void DateSpan::set_to_date(const std::string& rhs)
 {
-    toDate_ = DateTime(rhs);
+    to_date_ = DateTime(rhs);
 }
 
 char DateSpan::period() const
@@ -82,12 +82,12 @@ char DateSpan::period() const
     return period_;
 }
 
-void DateSpan::setPeriod(char rhs)
+void DateSpan::set_period(char rhs)
 {
     period_ = rhs;
 }
 
-void DateSpan::setPeriod(const std::string& rhs)
+void DateSpan::set_period(const std::string& rhs)
 {
     period_ = periodStrToByte(rhs);
 }
@@ -99,7 +99,7 @@ std::string DateSpan::getPeriodStr() const
 
 std::string DateSpan::toString() const
 {
-    return fromDate_.getDateStr() + "|" + toDate_.getDateStr() + "|" + getPeriodStr();
+    return from_date_.getDateStr() + "|" + to_date_.getDateStr() + "|" + getPeriodStr();
 }
 
 bool DateSpan::isWeekdaySet(char period, int day)

@@ -28,21 +28,21 @@ protected:
     void setTime(int year, int mon, int day, int hour, int min, int sec);
 
 protected:
-    bool isValid_;
-    time_t secTime_;
+    bool is_valid_;
+    time_t sec_time_;
     struct tm time_;
 };
 
 bool DateTime::isValid() const
 {
-    return isValid_;
+    return is_valid_;
 }
 
 DateTime& DateTime::addDay(int n)
 {
-    secTime_ += n*24*60*60;
-    struct tm* newTime = localtime(&secTime_);
-    memcpy(&time_, newTime, sizeof(time_));
+    sec_time_ += n*24*60*60;
+    struct tm* new_time = localtime(&sec_time_);
+    memcpy(&time_, new_time, sizeof(time_));
     return *this;
 }
 
@@ -53,7 +53,7 @@ int DateTime::getWeekday() const
 
 int DateTime::getDiffDayNum(const DateTime& rhs) const
 {
-    return secTime_/(24*60*60) - rhs.secTime_/(24*60*60);
+    return sec_time_/(24*60*60) - rhs.sec_time_/(24*60*60);
 }
 
 int DateTime::str2int(const std::string& str) const
@@ -63,12 +63,12 @@ int DateTime::str2int(const std::string& str) const
 
 bool DateTime::operator<(const DateTime& rhs) const
 {
-    return secTime_ < rhs.secTime_;
+    return sec_time_ < rhs.sec_time_;
 }
 
 bool DateTime::operator<=(const DateTime& rhs) const
 {
-    return secTime_ <= rhs.secTime_;
+    return sec_time_ <= rhs.sec_time_;
 }
 
 #endif // DATE_TIME_H_

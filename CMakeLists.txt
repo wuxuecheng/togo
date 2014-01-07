@@ -6,7 +6,7 @@ SET(CMAKE_C_COMPILER gcc)
 SET(CMAKE_C_FLAGS "-g -Wall -Wextra")
 
 SET(CMAKE_CXX_COMPILER g++)
-SET(CMAKE_CXX_FLAGS "-g -Wall -Wextra")
+SET(CMAKE_CXX_FLAGS "-g -Wall -Wextra -std=c++0x")
 
 INCLUDE_DIRECTORIES(include)
 

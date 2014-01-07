@@ -14,11 +14,11 @@ TEST_F(DateSpanTest, normalize)
     dp.normalize();
     EXPECT_EQ("2013-10-15|2013-10-16|23", dp.toString());
 
-    dp.setPeriod("2");
+    dp.set_period("2");
     dp.normalize();
     EXPECT_EQ("2013-10-15|2013-10-15|2", dp.toString());
 
-    dp.setPeriod("34");
+    dp.set_period("34");
     dp.normalize();
     EXPECT_EQ("0000-00-00|0000-00-00|", dp.toString());
 }
