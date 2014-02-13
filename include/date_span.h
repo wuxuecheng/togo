@@ -3,7 +3,7 @@
 
 #include <string>
 #include <vector>
-#include "DateTime.h"
+#include "date_time.h"
 
 class DateSpan
 {
@@ -40,8 +40,12 @@ protected:
     static bool canBeMerged(const DateSpan& first, const DateSpan& second);
     static bool hasEffectiveDay(const DateTime& start, const DateTime& end, char period);
     static inline bool isWeekdaySet(char period, int day);
+    static inline void incWeekday(int* day);
 
 protected:
+    // 日期区间为：[from_date_, to_date_)
+    // 周期位： 0:SUN, 1:MON, 2:TUS, 3:WED, 4:THU, 5:FRI, 6:SAT
+    // 如果 from_date >= to_date_，则置 period_ = 0，即为空值
     DateTime from_date_;
     DateTime to_date_;
     char period_;
@@ -106,6 +110,11 @@ bool DateSpan::isWeekdaySet(char period, int day)
 {
     char flag = 1 << ( day % 7);
     return (flag & period) != 0;
+}
+
+void DateSpan::incWeekday(int* day)
+{
+    *day = *day == 6 ? 0 : *day + 1;
 }
 
 #endif // DATE_SPAN_H_

@@ -48,7 +48,7 @@ DateTime& DateTime::addDay(int n)
 
 int DateTime::getWeekday() const
 {
-    return time_.tm_wday == 0 ? 7 : time_.tm_wday;
+    return time_.tm_wday;
 }
 
 int DateTime::getDiffDayNum(const DateTime& rhs) const
