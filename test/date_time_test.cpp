@@ -1,5 +1,5 @@
 #include "gtest/gtest.h"
-#include "DateTime.h"
+#include "date_time.h"
 #include <string>
 
 using namespace std;
@@ -14,7 +14,7 @@ TEST_F(DateTimeTest, Sunday)
     DateTime date(str);
     EXPECT_TRUE(date.isValid());
     EXPECT_EQ(str, date.getDateStr());
-    EXPECT_EQ(7, date.getWeekday()) << "date: " << str;
+    EXPECT_EQ(0, date.getWeekday()) << "date: " << str;
 }
 
 TEST_F(DateTimeTest, Monday)
