@@ -45,7 +45,7 @@ protected:
 protected:
     // 日期区间为：[from_date_, to_date_)
     // 周期位： 0:SUN, 1:MON, 2:TUS, 3:WED, 4:THU, 5:FRI, 6:SAT
-    // 如果 from_date >= to_date_，则置 period_ = 0，即为空值
+    // 如果 from_date >= to_date_，则没有有效日期
     DateTime from_date_;
     DateTime to_date_;
     char period_;
