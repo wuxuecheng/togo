@@ -276,7 +276,7 @@ DateSpan& DateSpan::normalize()
             effective |= (1 << wday);
             incWeekday(&wday);
         }
-        period_ = effective;
+        period_ &= effective;
     }
     return *this;
 }
